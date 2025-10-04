@@ -1,0 +1,61 @@
+blueprint:
+  name: PlatePushImage
+  description: Push an image onto an openhasp plate page
+  author: Jen Pierre Coenen
+  domain: automation
+  input: 
+    plate:
+      name: theplate
+      description: action/target displaye plate
+      selector:
+        entity:
+          filter:
+            domain: plate
+          multiple: false
+    page:
+      name: pageno
+      description: plate's page number where the image is displayed
+      selector:
+        number:
+          min: 1
+          max: 10
+triggers:
+  - trigger: state
+    entity_id: !plate theplate
+      - number.plate_page_number
+conditions:
+  - condition: state
+    entity_id: number.plate_page_number
+    state: !plate pageno
+actions:
+  - action: openhasp.push_image
+    metadata: {}
+    data:
+      image: http://esp32cam.local:8081
+      obj: p3b16
+      width: 480
+      height: 480
+    target:
+      entity_id: openhasp.plate1
+  - action: openhasp.push_image
+    metadata: {}
+    data:
+      obj: p3b16
+      width: 480
+      height: 480
+      image: http://esp32cam.local:8081
+    target:
+      entity_id: openhasp.plate
+  - action: openhasp.command
+    metadata: {}
+    data:
+      keyword: p3b15.hidden
+      parameters: "0"
+    target:
+      entity_id: openhasp.plate1
+  - action: input_boolean.turn_off
+    metadata: {}
+    data: {}
+    target:
+      entity_id: input_boolean.essai
+mode: single
